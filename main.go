@@ -10,8 +10,9 @@ import (
 var tasks []requestBody
 
 type requestBody struct {
-	ID   string `json:"id"`
-	Task string `json:"task"`
+	ID     string `json:"id"`
+	Task   string `json:"task"`
+	IsDone bool   `json:"isDone"`
 }
 
 func getTask(c echo.Context) error {
@@ -24,8 +25,9 @@ func postTask(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
 	}
 	ts := requestBody{
-		ID:   uuid.NewString(),
-		Task: req.Task,
+		ID:     uuid.NewString(),
+		Task:   req.Task,
+		IsDone: req.IsDone,
 	}
 
 	tasks = append(tasks, ts)
@@ -43,6 +45,7 @@ func patchTask(c echo.Context) error {
 	for i, ts := range tasks {
 		if ts.ID == id {
 			tasks[i].Task = req.Task
+			tasks[i].IsDone = req.IsDone
 			return c.JSON(http.StatusOK, tasks[i])
 		}
 	}
