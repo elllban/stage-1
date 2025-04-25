@@ -1,20 +1,21 @@
 package main
 
 import (
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"net/http"
 )
 
-var task string
+var tasks []requestBody
 
 type requestBody struct {
+	ID   string `json:"id"`
 	Task string `json:"task"`
 }
 
 func getTask(c echo.Context) error {
-	response := "hello, " + task
-	return c.JSON(http.StatusOK, response)
+	return c.JSON(http.StatusOK, &tasks)
 }
 
 func postTask(c echo.Context) error {
@@ -22,9 +23,42 @@ func postTask(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
 	}
+	ts := requestBody{
+		ID:   uuid.NewString(),
+		Task: req.Task,
+	}
 
-	task = req.Task
-	return c.JSON(http.StatusCreated, task)
+	tasks = append(tasks, ts)
+	return c.JSON(http.StatusCreated, ts)
+}
+
+func patchTask(c echo.Context) error {
+	id := c.Param("id")
+
+	var req requestBody
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
+	}
+
+	for i, ts := range tasks {
+		if ts.ID == id {
+			tasks[i].Task = req.Task
+			return c.JSON(http.StatusOK, tasks[i])
+		}
+	}
+	return c.JSON(http.StatusBadRequest, map[string]string{"error": "Task not found"})
+}
+
+func deleteTask(c echo.Context) error {
+	id := c.Param("id")
+
+	for i, ts := range tasks {
+		if ts.ID == id {
+			tasks = append(tasks[:i], tasks[i+1:]...)
+			return c.NoContent(http.StatusNoContent)
+		}
+	}
+	return c.JSON(http.StatusBadRequest, map[string]string{"error": "Task not found"})
 }
 
 func main() {
@@ -35,6 +69,8 @@ func main() {
 
 	e.GET("/task", getTask)
 	e.POST("/task", postTask)
+	e.PATCH("/task/:id", patchTask)
+	e.DELETE("/task/:id", deleteTask)
 
 	e.Start("localhost:8080")
 }
