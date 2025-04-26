@@ -4,19 +4,42 @@ import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	"log"
 	"net/http"
 )
 
-var tasks []requestBody
+var db *gorm.DB
+
+func initDB() {
+	dsn := "host=localhost user=task password=task dbname=task port=5432 sslmode=disable"
+	var err error
+
+	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		log.Fatalf("Could not connect to database: %v", err)
+	}
+
+	if err := db.AutoMigrate(&requestBody{}); err != nil {
+		log.Fatalf("Could not migrate: %v", err)
+	}
+}
 
 type requestBody struct {
-	ID     string `json:"id"`
+	ID     string `gorm:"primaryKey" json:"id"`
 	Task   string `json:"task"`
 	IsDone bool   `json:"isDone"`
 }
 
 func getTask(c echo.Context) error {
-	return c.JSON(http.StatusOK, &tasks)
+	var tasks []requestBody
+
+	if err := db.Find(&tasks).Error; err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Could not get tasks"})
+	}
+
+	return c.JSON(http.StatusOK, tasks)
 }
 
 func postTask(c echo.Context) error {
@@ -30,7 +53,11 @@ func postTask(c echo.Context) error {
 		IsDone: req.IsDone,
 	}
 
-	tasks = append(tasks, ts)
+	if err := db.Create(&ts).Error; err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Could not add task"})
+
+	}
+
 	return c.JSON(http.StatusCreated, ts)
 }
 
