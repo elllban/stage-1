@@ -69,29 +69,34 @@ func patchTask(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
 	}
 
-	for i, ts := range tasks {
-		if ts.ID == id {
-			tasks[i].Task = req.Task
-			tasks[i].IsDone = req.IsDone
-			return c.JSON(http.StatusOK, tasks[i])
-		}
+	var ts requestBody
+	if err := db.First(&ts, "id = ?", id).Error; err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Could not find task"})
 	}
-	return c.JSON(http.StatusBadRequest, map[string]string{"error": "Task not found"})
+
+	ts.Task = req.Task
+	ts.IsDone = req.IsDone
+
+	if err := db.Save(&ts).Error; err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Could not update task"})
+	}
+
+	return c.JSON(http.StatusOK, ts)
 }
 
 func deleteTask(c echo.Context) error {
 	id := c.Param("id")
 
-	for i, ts := range tasks {
-		if ts.ID == id {
-			tasks = append(tasks[:i], tasks[i+1:]...)
-			return c.NoContent(http.StatusNoContent)
-		}
+	if err := db.Delete(&requestBody{}, "id = ?", id).Error; err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Could not delete task"})
 	}
-	return c.JSON(http.StatusBadRequest, map[string]string{"error": "Task not found"})
+
+	return c.NoContent(http.StatusNoContent)
 }
 
 func main() {
+	initDB()
+
 	e := echo.New()
 
 	e.Use(middleware.CORS())
