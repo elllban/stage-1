@@ -1,0 +1,22 @@
+# Makefile для создания миграций
+
+# Переменные которые будут использоваться в наших командах (Таргетах)
+DB_DSN := "postgres://task:task@localhost:5432/task?sslmode=disable"
+MIGRATE := migrate -path ./internal/migrations -database $(DB_DSN)
+NAME := "tasks"
+
+# Таргет для создания новой миграции
+migrate-new:
+	migrate create -ext sql -dir ./internal/migrations ${NAME}
+
+# Применение миграций
+migrate:
+	$(MIGRATE) up
+
+# Откат миграций
+migrate-down:
+	$(MIGRATE) down
+
+# для удобства добавим команду run, которая будет запускать наше приложение
+run:
+	go run cmd/main.go

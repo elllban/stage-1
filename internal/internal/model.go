@@ -1,11 +1,12 @@
-package service
+package internal
 
-type RequestBody struct {
+type TaskRequest struct {
 	ID     string `gorm:"primaryKey" json:"id"`
 	Task   string `json:"task"`
 	IsDone bool   `json:"isDone"`
 }
-type Response struct {
+
+type TaskResponse struct {
 	Task   string `json:"task"`
 	IsDone bool   `json:"isDone"`
 }

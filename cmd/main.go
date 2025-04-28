@@ -6,6 +6,7 @@ import (
 	"log"
 	"stage-1/internal/db"
 	"stage-1/internal/handlers"
+	"stage-1/internal/repository"
 	"stage-1/internal/service"
 )
 
@@ -17,7 +18,7 @@ func main() {
 
 	e := echo.New()
 
-	tsRepo := service.NewTaskRepository(database)
+	tsRepo := repository.NewTaskRepository(database)
 	tsService := service.NewTaskService(tsRepo)
 	tsHandlers := handlers.NewTaskHandler(tsService)
 

@@ -3,6 +3,7 @@ package handlers
 import (
 	"github.com/labstack/echo/v4"
 	"net/http"
+	"stage-1/internal/internal"
 	"stage-1/internal/service"
 )
 
@@ -25,13 +26,13 @@ func (h *TaskHandler) GetTask(c echo.Context) error {
 }
 
 func (h *TaskHandler) PostTask(c echo.Context) error {
-	var req service.Response
+	var req internal.TaskResponse
 
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
 	}
 
-	ts, err := h.service.CreateTask(req.Task, req.IsDone)
+	ts, err := h.service.CreateTask(req)
 
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Could not create task"})
@@ -43,12 +44,12 @@ func (h *TaskHandler) PostTask(c echo.Context) error {
 func (h *TaskHandler) PatchTask(c echo.Context) error {
 	id := c.Param("id")
 
-	var req service.Response
+	var req internal.TaskResponse
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
 	}
 
-	updateTask, err := h.service.UpdateTask(id, req.Task, req.IsDone)
+	updateTask, err := h.service.UpdateTask(id, req)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Could not update task"})
 	}
