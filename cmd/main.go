@@ -8,6 +8,7 @@ import (
 	"stage-1/internal/handlers"
 	"stage-1/internal/repository"
 	"stage-1/internal/service"
+	"stage-1/internal/web/tasks"
 )
 
 func main() {
@@ -25,10 +26,10 @@ func main() {
 	e.Use(middleware.CORS())
 	e.Use(middleware.Logger())
 
-	e.GET("/task", tsHandlers.GetTask)
-	e.POST("/task", tsHandlers.PostTask)
-	e.PATCH("/task/:id", tsHandlers.PatchTask)
-	e.DELETE("/task/:id", tsHandlers.DeleteTask)
+	strictHandler := tasks.NewStrictHandler(tsHandlers, nil) // тут будет ошибка
+	tasks.RegisterHandlers(e, strictHandler)
 
-	e.Start("localhost:8080")
+	if err := e.Start(":8080"); err != nil {
+		log.Fatalf("failed to start with err: %v", err)
+	}
 }
