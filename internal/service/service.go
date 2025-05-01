@@ -45,7 +45,7 @@ func (s *tsService) CreateTask(req internal.TaskResponse) (internal.TaskRequest,
 func (s *tsService) GetAllTasks() ([]internal.TaskRequest, error) {
 	newTasks, err := s.repo.GetAllTasks()
 	ts := make([]internal.TaskRequest, len(newTasks))
-	for i, _ := range newTasks {
+	for i := range newTasks {
 		ts[i].ID = newTasks[i].ID
 		ts[i].Task = newTasks[i].Task
 		ts[i].IsDone = newTasks[i].IsDone
