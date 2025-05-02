@@ -1,17 +1,17 @@
-package handlers
+package taskHandlers
 
 import (
 	"context"
-	"stage-1/internal/internal"
-	"stage-1/internal/service"
+	"stage-1/internal/model"
+	"stage-1/internal/service/taskService"
 	"stage-1/internal/web/tasks"
 )
 
 type TaskHandler struct {
-	service service.TaskService
+	service taskService.TaskService
 }
 
-func NewTaskHandler(s service.TaskService) *TaskHandler {
+func NewTaskHandler(s taskService.TaskService) *TaskHandler {
 	return &TaskHandler{service: s}
 }
 
@@ -38,7 +38,7 @@ func (h *TaskHandler) GetTasks(_ context.Context, _ tasks.GetTasksRequestObject)
 func (h *TaskHandler) PostTasks(_ context.Context, request tasks.PostTasksRequestObject) (tasks.PostTasksResponseObject, error) {
 	taskRequest := request.Body
 
-	taskToCreate := internal.TaskResponse{
+	taskToCreate := model.TaskResponse{
 		Task:   *taskRequest.Task,
 		IsDone: *taskRequest.IsDone,
 	}
@@ -63,7 +63,7 @@ func (h *TaskHandler) PatchTasksId(_ context.Context, request tasks.PatchTasksId
 
 	taskRequest := request.Body
 
-	taskToUpdate := internal.TaskResponse{
+	taskToUpdate := model.TaskResponse{
 		Task:   *taskRequest.Task,
 		IsDone: *taskRequest.IsDone,
 	}
@@ -82,13 +82,12 @@ func (h *TaskHandler) PatchTasksId(_ context.Context, request tasks.PatchTasksId
 	return response, nil
 }
 
-func (h *TaskHandler) DeleteTasksId(ctx context.Context, request tasks.DeleteTasksIdRequestObject) (tasks.DeleteTasksIdResponseObject, error) {
+func (h *TaskHandler) DeleteTasksId(_ context.Context, request tasks.DeleteTasksIdRequestObject) (tasks.DeleteTasksIdResponseObject, error) {
 	id := request.Id
 
-	err := h.service.DeleteTask(id)
-	if err != nil {
+	if err := h.service.DeleteTask(id); err != nil {
 		return nil, err
 	}
 
-	return tasks.DeleteTasksId204Response{}, err
+	return tasks.DeleteTasksId204Response{}, nil
 }

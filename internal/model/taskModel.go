@@ -1,4 +1,4 @@
-package internal
+package model
 
 type TaskRequest struct {
 	ID     string `gorm:"primaryKey" json:"id"`
