@@ -5,10 +5,14 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"log"
 	"stage-1/internal/db"
-	"stage-1/internal/handlers"
-	"stage-1/internal/repository"
-	"stage-1/internal/service"
+	"stage-1/internal/handlers/taskHandlers"
+	"stage-1/internal/handlers/userHandlers"
+	"stage-1/internal/repository/taskRepository"
+	"stage-1/internal/repository/userRepository"
+	"stage-1/internal/service/taskService"
+	"stage-1/internal/service/userService"
 	"stage-1/internal/web/tasks"
+	"stage-1/internal/web/users"
 )
 
 func main() {
@@ -19,15 +23,22 @@ func main() {
 
 	e := echo.New()
 
-	tsRepo := repository.NewTaskRepository(database)
-	tsService := service.NewTaskService(tsRepo)
-	tsHandlers := handlers.NewTaskHandler(tsService)
+	tsRepo := taskRepository.NewTaskRepository(database)
+	tsService := taskService.NewTaskService(tsRepo)
+	tsHandlers := taskHandlers.NewTaskHandler(tsService)
+
+	usRepo := userRepository.NewUserRepository(database)
+	usService := userService.NewUserService(usRepo)
+	usHandlers := userHandlers.NewUserHandler(usService)
 
 	e.Use(middleware.CORS())
 	e.Use(middleware.Logger())
 
-	strictHandler := tasks.NewStrictHandler(tsHandlers, nil) // тут будет ошибка
-	tasks.RegisterHandlers(e, strictHandler)
+	tsStrictHandler := tasks.NewStrictHandler(tsHandlers, nil)
+	tasks.RegisterHandlers(e, tsStrictHandler)
+
+	usStrictHandler := users.NewStrictHandler(usHandlers, nil)
+	users.RegisterHandlers(e, usStrictHandler)
 
 	if err := e.Start(":8080"); err != nil {
 		log.Fatalf("failed to start with err: %v", err)
