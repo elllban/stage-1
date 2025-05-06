@@ -3,7 +3,7 @@
 # Переменные которые будут использоваться в наших командах (Таргетах)
 DB_DSN := "postgres://task:task@localhost:5432/task?sslmode=disable"
 MIGRATE := migrate -path ./internal/migrations -database $(DB_DSN)
-NAME := "tasks"
+NAME := "alterTasks"
 
 # Таргет для создания новой миграции
 migrate-new:
