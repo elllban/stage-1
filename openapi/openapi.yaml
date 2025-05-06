@@ -139,6 +139,26 @@ paths:
       responses:
         '204':
           description: User deleted successfully
+  /users/{user_id}/tasks:
+    get:
+      summary: Get tasks for specific user
+      tags:
+        - users
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of user's tasks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Task'
 
 components:
   schemas:
@@ -151,6 +171,8 @@ components:
           type: string
         isDone:
           type: boolean
+        userID:
+          type: string
     User:
       type: object
       properties:

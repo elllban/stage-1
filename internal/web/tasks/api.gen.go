@@ -19,6 +19,7 @@ type Task struct {
 	Id     *string `json:"id,omitempty"`
 	Task   *string `json:"task,omitempty"`
 	IsDone *bool   `json:"isDone,omitempty"`
+	UserID *string `json:"userID,omitempty"`
 }
 
 // PostTasksJSONRequestBody defines body for PostTasks for application/json ContentType.
