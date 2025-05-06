@@ -27,6 +27,7 @@ func (s *tsService) CreateTask(res model.TaskResponse) (model.TaskRequest, error
 		ID:     uuid.NewString(),
 		Task:   res.Task,
 		IsDone: res.IsDone,
+		UserID: res.UserID,
 	}
 
 	if err := s.repo.CreateTask(newTask); err != nil {
@@ -37,6 +38,7 @@ func (s *tsService) CreateTask(res model.TaskResponse) (model.TaskRequest, error
 		ID:     newTask.ID,
 		Task:   newTask.Task,
 		IsDone: newTask.IsDone,
+		UserID: newTask.UserID,
 	}
 
 	return ts, nil
@@ -53,6 +55,7 @@ func (s *tsService) GetAllTasks() ([]model.TaskRequest, error) {
 		ts[i].ID = newTasks[i].ID
 		ts[i].Task = newTasks[i].Task
 		ts[i].IsDone = newTasks[i].IsDone
+		ts[i].UserID = newTasks[i].UserID
 	}
 	return ts, nil
 }
@@ -67,6 +70,7 @@ func (s *tsService) GetTaskByID(id string) (model.TaskRequest, error) {
 		ID:     newTask.ID,
 		Task:   newTask.Task,
 		IsDone: newTask.IsDone,
+		UserID: newTask.UserID,
 	}
 	return ts, nil
 }
@@ -79,6 +83,7 @@ func (s *tsService) UpdateTask(id string, req model.TaskResponse) (model.TaskReq
 
 	newTasks.Task = req.Task
 	newTasks.IsDone = req.IsDone
+	newTasks.UserID = req.UserID
 
 	if err := s.repo.UpdateTask(newTasks); err != nil {
 		return model.TaskRequest{}, err
@@ -88,6 +93,7 @@ func (s *tsService) UpdateTask(id string, req model.TaskResponse) (model.TaskReq
 		ID:     newTasks.ID,
 		Task:   newTasks.Task,
 		IsDone: newTasks.IsDone,
+		UserID: newTasks.UserID,
 	}
 	return ts, nil
 }

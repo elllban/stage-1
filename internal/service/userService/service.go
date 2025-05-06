@@ -10,6 +10,7 @@ type UserService interface {
 	CreateUser(res model.UserResponse) (model.UserRequest, error)
 	GetAllUsers() ([]model.UserRequest, error)
 	GetUserByID(id string) (model.UserRequest, error)
+	GetTasksForUser(userId string) ([]model.TaskRequest, error)
 	UpdateUser(id string, res model.UserResponse) (model.UserRequest, error)
 	DeleteUser(id string) error
 }
@@ -71,6 +72,23 @@ func (s *usService) GetUserByID(id string) (model.UserRequest, error) {
 	}
 
 	return us, nil
+}
+
+func (s *usService) GetTasksForUser(userId string) ([]model.TaskRequest, error) {
+	allTasks, err := s.repo.GetTasksForUser(userId)
+	if err != nil {
+		return []model.TaskRequest{}, err
+	}
+
+	ts := make([]model.TaskRequest, len(allTasks))
+	for i := range allTasks {
+		ts[i].ID = allTasks[i].ID
+		ts[i].Task = allTasks[i].Task
+		ts[i].IsDone = allTasks[i].IsDone
+		ts[i].UserID = allTasks[i].UserID
+	}
+
+	return ts, nil
 }
 
 func (s *usService) UpdateUser(id string, res model.UserResponse) (model.UserRequest, error) {

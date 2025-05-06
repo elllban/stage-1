@@ -28,6 +28,7 @@ func (h *TaskHandler) GetTasks(_ context.Context, _ tasks.GetTasksRequestObject)
 			Id:     &tsk.ID,
 			Task:   &tsk.Task,
 			IsDone: &tsk.IsDone,
+			UserID: &tsk.UserID,
 		}
 		response = append(response, task)
 	}
@@ -41,6 +42,7 @@ func (h *TaskHandler) PostTasks(_ context.Context, request tasks.PostTasksReques
 	taskToCreate := model.TaskResponse{
 		Task:   *taskRequest.Task,
 		IsDone: *taskRequest.IsDone,
+		UserID: *taskRequest.UserID,
 	}
 	createdTask, err := h.service.CreateTask(taskToCreate)
 
@@ -52,6 +54,7 @@ func (h *TaskHandler) PostTasks(_ context.Context, request tasks.PostTasksReques
 		Id:     &createdTask.ID,
 		Task:   &createdTask.Task,
 		IsDone: &createdTask.IsDone,
+		UserID: &createdTask.UserID,
 	}
 
 	return response, nil
@@ -66,6 +69,7 @@ func (h *TaskHandler) PatchTasksId(_ context.Context, request tasks.PatchTasksId
 	taskToUpdate := model.TaskResponse{
 		Task:   *taskRequest.Task,
 		IsDone: *taskRequest.IsDone,
+		UserID: *taskRequest.UserID,
 	}
 
 	updatedTask, err := h.service.UpdateTask(id, taskToUpdate)
@@ -77,6 +81,7 @@ func (h *TaskHandler) PatchTasksId(_ context.Context, request tasks.PatchTasksId
 		Id:     &updatedTask.ID,
 		Task:   &updatedTask.Task,
 		IsDone: &updatedTask.IsDone,
+		UserID: &updatedTask.UserID,
 	}
 
 	return response, nil
